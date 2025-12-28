@@ -2,8 +2,9 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8" />
-  <title>Elemente de cinematică – Activități interactive</title>
+  <title>Elemente de Cinematică – Activități interactive MRU & MRUV</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Simulare cinematică pentru clasa a IX-a. Introdu valori pentru viteza initiala v0, acceleratia a si timpul t, apoi vezi evolutia pozitiei si vitezei in MRU/MRUV.">
   <style>
     :root {
       --accent: #005bbb;
@@ -314,10 +315,9 @@
         </div>
         <div class="card-body">
           <p>
-            Alege un scenariu, introdu valorile pentru
-            <em>viteza inițială</em> <code>v₀</code>, <em>accelerația</em> <code>a</code> și
-            <em>timpul</em> <code>t</code>. Apasă pe <strong>„Simulează mișcarea”</strong>
-            și vezi ce se întâmplă cu poziția și viteza.
+            Alege un scenariu, introdu valorile pentru viteza inițială v0, accelerația a și
+            timpul t. Apasă pe <strong>„Simulează mișcarea”</strong> și vezi ce se întâmplă
+            cu poziția și viteza.
           </p>
 
           <label for="scenario">Scenariu</label>
@@ -330,7 +330,7 @@
 
           <div class="inputs-row">
             <div>
-              <label for="v0">v₀ (m/s)</label>
+              <label for="v0">v0 (m/s)</label>
               <input id="v0" type="number" step="0.1" placeholder="ex: 2" />
             </div>
             <div>
@@ -344,8 +344,8 @@
           </div>
 
           <p class="hint">
-            Sugestie rapidă: pentru <strong>MRU</strong> pune <code>a = 0</code>. Pentru
-            <strong>MRUV</strong> alege un <code>a</code> pozitiv (accelerare) sau negativ
+            Sugestie rapidă: pentru <strong>MRU</strong> pune a = 0. Pentru
+            <strong>MRUV</strong> alege un a pozitiv (accelerare) sau negativ
             (frânare).
           </p>
 
@@ -355,9 +355,9 @@
 
           <div id="sim-results" class="results" style="display:none;"></div>
           <div class="small-note">
-            Formula folosită: <br/>
-            <code>x = x₀ + v₀·t + ½·a·t²</code> (cu <code>x₀ = 0</code>)<br/>
-            <code>v = v₀ + a·t</code>
+            Formule folosite: <br/>
+            <code>x = x0 + v0 · t + 1/2 · a · t²</code> (cu x0 = 0) <br/>
+            <code>v = v0 + a · t</code>
           </div>
         </div>
       </section>
@@ -420,12 +420,12 @@
           <div id="step3" class="step">
             <div class="step-indicator">Pasul 3 din 3 – MRUV</div>
             <div class="step-header">
-              Acum sfera pornește din repaus pe o pantă netedă: v₀ = 0,
+              Acum sfera pornește din repaus pe o pantă netedă: v0 = 0,
               a = 2 m/s².
             </div>
             <p>Cât este distanța parcursă după 5 secunde?</p>
             <p class="hint">
-              Folosește formula: x = ½·a·t²
+              Folosește formula: x = 1/2 · a · t²
             </p>
             <label for="x5-input">x (m)</label>
             <input id="x5-input" type="number" step="0.1" />
@@ -459,7 +459,7 @@
       if (isNaN(v0) || isNaN(a) || isNaN(t) || t < 0) {
         resultsEl.style.display = "block";
         resultsEl.innerHTML =
-          "⚠ Te rog introdu valori numerice corecte pentru v₀, a și t (t ≥ 0).";
+          "⚠ Te rog introdu valori numerice corecte pentru v0, a și t (t ≥ 0).";
         return;
       }
 
@@ -578,7 +578,7 @@
         const finish = document.getElementById("finish");
         finish.style.display = "block";
       } else {
-        fb.textContent = "✖ Mai încearcă. Încearcă formula x = ½·a·t².";
+        fb.textContent = "✖ Mai încearcă. Încearcă formula x = 1/2 · a · t².";
         fb.className = "feedback err";
       }
     }
