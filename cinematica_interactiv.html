@@ -37,14 +37,10 @@
       padding: 24px 16px 40px;
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-    }
-
     h1 {
       text-align: center;
       font-size: 1.8rem;
-      margin-bottom: 0.25rem;
+      margin: 0 0 0.25rem 0;
     }
 
     .subtitle {
@@ -289,6 +285,13 @@
       color: var(--muted);
       margin-top: 6px;
     }
+
+    code {
+      background: #eef1ff;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -312,8 +315,8 @@
         <div class="card-body">
           <p>
             Alege un scenariu, introdu valorile pentru
-            <em>viteza inițială</em> \(v_0\), <em>accelerația</em> \(a\) și
-            <em>timpul</em> \(t\). Apasă pe <strong>„Simulează mișcarea”</strong>
+            <em>viteza inițială</em> <code>v₀</code>, <em>accelerația</em> <code>a</code> și
+            <em>timpul</em> <code>t</code>. Apasă pe <strong>„Simulează mișcarea”</strong>
             și vezi ce se întâmplă cu poziția și viteza.
           </p>
 
@@ -341,8 +344,8 @@
           </div>
 
           <p class="hint">
-            Sugestie rapidă: pentru <strong>MRU</strong> pune \(a = 0\). Pentru
-            <strong>MRUV</strong> alege un \(a\) pozitiv (accelerare) sau negativ
+            Sugestie rapidă: pentru <strong>MRU</strong> pune <code>a = 0</code>. Pentru
+            <strong>MRUV</strong> alege un <code>a</code> pozitiv (accelerare) sau negativ
             (frânare).
           </p>
 
@@ -353,8 +356,8 @@
           <div id="sim-results" class="results" style="display:none;"></div>
           <div class="small-note">
             Formula folosită: <br/>
-            \(x = x_0 + v_0 t + \frac{1}{2} a t^2\) (cu \(x_0 = 0\))  
-            \(v = v_0 + a t\)
+            <code>x = x₀ + v₀·t + ½·a·t²</code> (cu <code>x₀ = 0</code>)<br/>
+            <code>v = v₀ + a·t</code>
           </div>
         </div>
       </section>
@@ -380,8 +383,8 @@
           <div id="step1" class="step active">
             <div class="step-indicator">Pasul 1 din 3 – viteza medie</div>
             <div class="step-header">Sfera parcurge 40 m în 8 s.</div>
-            <p>Calculează viteza medie \(v_{med}\).</p>
-            <label for="vmed-input">v<sub>med</sub> (m/s)</label>
+            <p>Calculează viteza medie v_med.</p>
+            <label for="vmed-input">v_med (m/s)</label>
             <input id="vmed-input" type="number" step="0.01" />
             <button type="button" onclick="checkStep1()">Verifică</button>
             <div id="fb1" class="feedback"></div>
@@ -417,12 +420,12 @@
           <div id="step3" class="step">
             <div class="step-indicator">Pasul 3 din 3 – MRUV</div>
             <div class="step-header">
-              Acum sfera pornește din repaus pe o pantă netedă: \(v_0 = 0\),
-              \(a = 2~\text{m/s}^2\).
+              Acum sfera pornește din repaus pe o pantă netedă: v₀ = 0,
+              a = 2 m/s².
             </div>
-            <p>Cât este distanța parcursă după \(5\) secunde?</p>
+            <p>Cât este distanța parcursă după 5 secunde?</p>
             <p class="hint">
-              Folosește formula: \(x = \frac{1}{2} a t^2\)
+              Folosește formula: x = ½·a·t²
             </p>
             <label for="x5-input">x (m)</label>
             <input id="x5-input" type="number" step="0.1" />
@@ -441,7 +444,6 @@
   </div>
 
   <script>
-    // === ACTIVITATEA 1: Simulare mișcare ===
     function roundTo(num, decimals) {
       const factor = Math.pow(10, decimals);
       return Math.round(num * factor) / factor;
@@ -484,7 +486,7 @@
         a === 0
           ? "Mișcarea este rectilinie uniformă (MRU): viteza este constantă."
           : a > 0
-          ? "Mișcarea este rectilinie uniform variată accelerată (MRUA, a > 0)."
+          ? "Mișcarea este rectilinie uniform variată accelerată (a > 0)."
           : "Mișcarea este rectilinie uniform variată încetinită (a < 0).";
 
       resultsEl.style.display = "block";
@@ -497,7 +499,6 @@
         "Interpretare:\n" + desc;
     });
 
-    // === ACTIVITATEA 2: Escape Room ===
     function revealStep(stepId) {
       ["step1", "step2", "step3"].forEach(id => {
         const el = document.getElementById(id);
@@ -553,7 +554,7 @@
           revealStep("step3");
         }, 800);
       } else {
-        fb.textContent = "✖ Nu este aceasta. Gândește-te: v este constantă sau nu?";
+        fb.textContent = "✖ Nu este aceasta. Gândește-te: viteza este constantă sau nu?";
         fb.className = "feedback err";
       }
     }
@@ -577,7 +578,7 @@
         const finish = document.getElementById("finish");
         finish.style.display = "block";
       } else {
-        fb.textContent = "✖ Mai încearcă. Încearcă formula x = ½ · a · t².";
+        fb.textContent = "✖ Mai încearcă. Încearcă formula x = ½·a·t².";
         fb.className = "feedback err";
       }
     }
