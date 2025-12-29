@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulare MRU & MRUV – Cinematică</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Simulare cinematică pentru clasa a IX-a. Introdu valori pentru viteza inițială v0, accelerația a și timpul t, apoi vezi evoluția poziției și vitezei în MRU/MRUV.">
+  <style>
+    :root {
+      --accent: #005bbb;
+      --accent-soft: #e5f1ff;
+      --bg: #f7f7fb;
+      --card-bg: #ffffff;
+      --text: #222222;
+      --muted: #666666;
+      --radius-lg: 16px;
+      --shadow-soft: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background: radial-gradient(circle at top, #dde9ff 0, #f7f7fb 45%, #f7f7fb 100%);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge span { font-size: 1rem; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 18px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right,
+        rgba(0,91,187,0.08) 0, transparent 55%);
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-emoji { font-size: 1.4rem; }
+
+    .card-body {
+      position: relative;
+      z-index: 1;
+      font-size: 0.95rem;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d0d4e4;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(0,91,187,0.2);
+    }
+
+    .inputs-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .inputs-row { grid-template-columns: 1fr; }
+    }
+
+    button {
+      margin-top: 14px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(0,91,187,0.3);
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0,91,187,0.25);
+    }
+
+    .results {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #f3f6ff;
+      border: 1px dashed #c1c8ec;
+      font-size: 0.9rem;
+      white-space: pre-line;
+    }
+
+    .results strong { color: var(--accent); }
+
+    .small-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* --- Grafic x(t) & v(t) --- */
+    .graph-wrapper {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid #dbe3ff;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+
+    .graph-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+    }
+
+    #sim-graph, #sim-graph-v {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .graph-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Simulare MRU &amp; MRUV</h1>
+    <p class="subtitle">
+      <span class="badge"><span>🎮</span> Pentru clasa a IX-a</span>
+      <br/>
+      Joacă-te cu viteza inițială <i>v₀</i>, accelerația <i>a</i> și timpul <i>t</i>. Observă graficele <i>x(t)</i> și <i>v(t)</i>.
+    </p>
+
+    <section class="card" id="simulare-card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="card-title-emoji">🚗</span>
+          <span>„Tu ești obiectul în mișcare”</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <p>
+          Alege un scenariu, introdu valorile pentru viteza inițială <em>v₀</em>,
+          accelerația <em>a</em> și timpul <em>t</em>. Apasă pe
+          <strong>„Simulează mișcarea”</strong> și vezi ce se întâmplă cu poziția
+          <em>x(t)</em> și viteza <em>v(t)</em>.
+        </p>
+
+        <label for="scenario">Scenariu</label>
+        <select id="scenario">
+          <option value="bus">Alergi după autobuz</option>
+          <option value="bike">Mergi cu bicicleta pe o pantă</option>
+          <option value="ball">Arunci o minge în sus</option>
+          <option value="car">Mașină care frânează la semafor</option>
+        </select>
+
+        <div class="inputs-row">
+          <div>
+            <label for="v0"><em>v₀</em> (m/s)</label>
+            <input id="v0" type="number" step="0.1" placeholder="ex: 2" />
+          </div>
+          <div>
+            <label for="a"><em>a</em> (m/s²)</label>
+            <input id="a" type="number" step="0.1" placeholder="ex: 1.5" />
+          </div>
+          <div>
+            <label for="t"><em>t</em> (s)</label>
+            <input id="t" type="number" step="0.1" placeholder="ex: 4" />
+          </div>
+        </div>
+
+        <p class="hint">
+          Pentru <strong>MRU</strong> pune <em>a</em> = 0. Pentru <strong>MRUV</strong> alege un <em>a</em> pozitiv (accelerare)
+          sau negativ (frânare).
+        </p>
+
+        <button id="simulate-btn" type="button">
+          ▶ Simulează mișcarea
+        </button>
+
+        <div id="sim-results" class="results" style="display:none;"></div>
+
+        <!-- GRAFIC x(t) -->
+        <div class="graph-wrapper">
+          <div class="graph-title">Graficul poziției <em>x</em> în funcție de timp <em>t</em></div>
+          <div class="graph-container">
+            <canvas id="sim-graph"></canvas>
+          </div>
+          <div class="graph-labels">
+            <span><em>x</em> (m)</span>
+            <span><em>t</em> (s)</span>
+          </div>
+        </div>
+
+        <!-- GRAFIC v(t) -->
+        <div class="graph-wrapper">
+          <div class="graph-title">Graficul vitezei <em>v</em> în funcție de timp <em>t</em></div>
+          <div class="graph-container">
+            <canvas id="sim-graph-v"></canvas>
+          </div>
+          <div class="graph-labels">
+            <span><em>v</em> (m/s)</span>
+            <span><em>t</em> (s)</span>
+          </div>
+        </div>
+
+        <div class="small-note">
+          Formule folosite (presupunem <em>x₀</em> = 0):<br/>
+          <em>x(t)</em> = <em>v₀</em> · <em>t</em> + ½ · <em>a</em> · <em>t</em>²<br/>
+          <em>v(t)</em> = <em>v₀</em> + <em>a</em> · <em>t</em>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function roundTo(num, decimals) {
+      const factor = Math.pow(10, decimals);
+      return Math.round(num * factor) / factor;
+    }
+
+    // --- desen grafic x(t) ---
+    function drawSimGraph(v0, a, tMax) {
+      const canvas = document.getElementById("sim-graph");
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const left = 35;
+      const bottom = h - 25;
+      const right = w - 10;
+      const top = 15;
+
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 1.5;
+
+      // axe
+      ctx.beginPath();
+      ctx.moveTo(left, bottom);
+      ctx.lineTo(right, bottom);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(left, bottom);
+      ctx.lineTo(left, top);
+      ctx.stroke();
+
+      if (tMax <= 0) return;
+
+      const steps = 40;
+      const points = [];
+      let xMax = 0;
+      for (let i = 0; i <= steps; i++) {
+        const t = (tMax * i) / steps;
+        const x = v0 * t + 0.5 * a * t * t;
+        points.push({ t, x });
+        if (x > xMax) xMax = x;
+      }
+      if (xMax === 0) xMax = 1;
+
+      const width = right - left;
+      const height = bottom - top;
+
+      ctx.strokeStyle = "#2563eb";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      points.forEach((p, index) => {
+        const px = left + (p.t / tMax) * width;
+        const py = bottom - (p.x / xMax) * height;
+        if (index === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+
+      // repere t
+      ctx.fillStyle = "#374151";
+      ctx.font = "10px system-ui";
+      ctx.textAlign = "center";
+      const nTicks = 4;
+      for (let i = 0; i <= nTicks; i++) {
+        const tt = (tMax * i) / nTicks;
+        const px = left + (tt / tMax) * width;
+        ctx.beginPath();
+        ctx.moveTo(px, bottom);
+        ctx.lineTo(px, bottom + 4);
+        ctx.strokeStyle = "#9ca3af";
+        ctx.stroke();
+        ctx.fillText(tt.toFixed(1), px, bottom + 14);
+      }
+
+      // repere x
+      ctx.textAlign = "right";
+      const xTicks = 4;
+      for (let i = 1; i <= xTicks; i++) {
+        const xx = (xMax * i) / xTicks;
+        const py = bottom - (xx / xMax) * height;
+        ctx.beginPath();
+        ctx.moveTo(left - 4, py);
+        ctx.lineTo(left, py);
+        ctx.strokeStyle = "#9ca3af";
+        ctx.stroke();
+        ctx.fillText(xx.toFixed(1), left - 6, py + 3);
+      }
+    }
+
+    // --- desen grafic v(t) ---
+    function drawSimGraphV(v0, a, tMax) {
+      const canvas = document.getElementById("sim-graph-v");
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const left = 35;
+      const bottom = h - 25;
+      const right = w - 10;
+      const top = 15;
+
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 1.5;
+
+      // axe
+      ctx.beginPath();
+      ctx.moveTo(left, bottom);
+      ctx.lineTo(right, bottom);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(left, bottom);
+      ctx.lineTo(left, top);
+      ctx.stroke();
+
+      if (tMax <= 0) return;
+
+      const steps = 40;
+      const points = [];
+      let vMin = Infinity;
+      let vMax = -Infinity;
+      for (let i = 0; i <= steps; i++) {
+        const t = (tMax * i) / steps;
+        const v = v0 + a * t;
+        points.push({ t, v });
+        if (v < vMin) vMin = v;
+        if (v > vMax) vMax = v;
+      }
+      if (vMax === vMin) vMax = vMin + 1;
+
+      const width = right - left;
+      const height = bottom - top;
+
+      ctx.strokeStyle = "#16a34a";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      points.forEach((p, index) => {
+        const px = left + (p.t / tMax) * width;
+        const py = bottom - ((p.v - vMin) / (vMax - vMin)) * height;
+        if (index === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+
+      // repere t
+      ctx.fillStyle = "#374151";
+      ctx.font = "10px system-ui";
+      ctx.textAlign = "center";
+      const nTicks = 4;
+      for (let i = 0; i <= nTicks; i++) {
+        const tt = (tMax * i) / nTicks;
+        const px = left + (tt / tMax) * width;
+        ctx.beginPath();
+        ctx.moveTo(px, bottom);
+        ctx.lineTo(px, bottom + 4);
+        ctx.strokeStyle = "#9ca3af";
+        ctx.stroke();
+        ctx.fillText(tt.toFixed(1), px, bottom + 14);
+      }
+
+      // repere v
+      ctx.textAlign = "right";
+      const vTicks = 4;
+      for (let i = 0; i <= vTicks; i++) {
+        const vv = vMin + (vMax - vMin) * (i / vTicks);
+        const py = bottom - ((vv - vMin) / (vMax - vMin)) * height;
+        ctx.beginPath();
+        ctx.moveTo(left - 4, py);
+        ctx.lineTo(left, py);
+        ctx.strokeStyle = "#9ca3af";
+        ctx.stroke();
+        ctx.fillText(vv.toFixed(1), left - 6, py + 3);
+      }
+    }
+
+    document.getElementById("simulate-btn").addEventListener("click", () => {
+      const scenario = document.getElementById("scenario").value;
+      const v0 = parseFloat(document.getElementById("v0").value);
+      const a = parseFloat(document.getElementById("a").value);
+      const t = parseFloat(document.getElementById("t").value);
+      const resultsEl = document.getElementById("sim-results");
+
+      if (isNaN(v0) || isNaN(a) || isNaN(t) || t < 0) {
+        resultsEl.style.display = "block";
+        resultsEl.innerHTML =
+          "⚠ Te rog introdu valori numerice corecte pentru v₀, a și t (t ≥ 0).";
+        return;
+      }
+
+      const x = v0 * t + 0.5 * a * t * t;
+      const v = v0 + a * t;
+
+      let scenText = "";
+      switch (scenario) {
+        case "bus":
+          scenText = "Alergi după autobuz pe trotuar.";
+          break;
+        case "bike":
+          scenText = "Mergi cu bicicleta pe o pantă ușoară.";
+          break;
+        case "ball":
+          scenText = "Arunci o minge în sus, de la nivelul solului.";
+          break;
+        case "car":
+          scenText = "O mașină frânează lin la semafor.";
+          break;
+      }
+
+      const desc =
+        a === 0
+          ? "Mișcarea este rectilinie uniformă (MRU): viteza este constantă, graficul x(t) este o linie dreaptă, iar graficul v(t) este o linie orizontală."
+          : a > 0
+          ? "Mișcarea este rectilinie uniform variată accelerată (a > 0): graficul x(t) este o curbă concavă în sus (parabolă), iar graficul v(t) este o dreaptă crescătoare."
+          : "Mișcarea este rectilinie uniform variată încetinită (a < 0): graficul x(t) este o curbă concavă în jos (parabolă), iar graficul v(t) este o dreaptă descrescătoare.";
+
+      resultsEl.style.display = "block";
+      resultsEl.innerHTML =
+        "📌 Scenariu: " + scenText +
+        "\n\n" +
+        "După " + roundTo(t, 2) + " s:\n" +
+        "• Poziția este x ≈ " + roundTo(x, 2) + " m față de punctul de plecare.\n" +
+        "• Viteza este v ≈ " + roundTo(v, 2) + " m/s.\n\n" +
+        "Interpretare:\n" + desc;
+
+      drawSimGraph(v0, a, t <= 0 ? 1 : t);
+      drawSimGraphV(v0, a, t <= 0 ? 1 : t);
+    });
+
+    window.addEventListener("resize", () => {
+      const v0 = parseFloat(document.getElementById("v0").value);
+      const a = parseFloat(document.getElementById("a").value);
+      const t = parseFloat(document.getElementById("t").value);
+      if (!isNaN(v0) && !isNaN(a) && !isNaN(t) && t > 0) {
+        drawSimGraph(v0, a, t);
+        drawSimGraphV(v0, a, t);
+      }
+    });
+  </script>
+</body>
+</html>
