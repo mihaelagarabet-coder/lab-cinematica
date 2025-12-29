@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Escape Room – Cinematică</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --accent: #0f766e;
+      --bg: #ecfeff;
+      --card-bg: #ffffff;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0; padding:0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #ccfbf1 0, #ecfeff 40%, #f8fafc 100%);
+      color:#0f172a;
+    }
+    .page{
+      max-width:900px;
+      margin:0 auto;
+      padding:24px 16px 40px;
+    }
+
+    h1{
+      text-align:center;
+      font-size:1.9rem;
+      margin:0 0 0.3rem;
+    }
+    .subtitle{
+      text-align:center;
+      color:var(--muted);
+      margin-bottom:18px;
+    }
+
+    .progress-bar{
+      height:8px;
+      background:#e2e8f0;
+      border-radius:999px;
+      overflow:hidden;
+      margin:0 auto 18px;
+      max-width:420px;
+    }
+    .progress-fill{
+      height:100%;
+      width:0;
+      background:linear-gradient(90deg,#22c55e,#0ea5e9);
+      transition:width .3s ease;
+    }
+
+    .card{
+      background:var(--card-bg);
+      border-radius:16px;
+      padding:18px 18px 20px;
+      box-shadow:0 8px 20px rgba(15,23,42,.12);
+    }
+
+    .step-indicator{
+      font-size:0.85rem;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .step-title{
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .step{
+      display:none;
+      animation:fadeIn .25s ease-out;
+    }
+    .step.active{ display:block; }
+
+    @keyframes fadeIn{
+      from{ opacity:0; transform:translateY(4px); }
+      to{ opacity:1; transform:none; }
+    }
+
+    label{
+      display:block;
+      font-size:0.9rem;
+      margin-top:8px;
+      margin-bottom:2px;
+      font-weight:600;
+    }
+
+    input[type="number"]{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid #cbd5f5;
+      font-size:0.9rem;
+      outline:none;
+    }
+    input[type="number"]:focus{
+      border-color:#0ea5e9;
+      box-shadow:0 0 0 1px rgba(14,165,233,.25);
+    }
+
+    button{
+      margin-top:10px;
+      padding:8px 16px;
+      border-radius:999px;
+      border:none;
+      background:#0f766e;
+      color:white;
+      font-weight:600;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    button:hover{ filter:brightness(1.05); }
+
+    .hint{
+      font-size:0.85rem;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    .feedback{
+      margin-top:8px;
+      font-size:0.9rem;
+      font-weight:600;
+    }
+    .feedback.ok{ color:var(--success); }
+    .feedback.err{ color:var(--danger); }
+
+    .badge-room{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#ecfeff;
+      border:1px dashed #22c55e;
+      font-size:0.8rem;
+      margin-bottom:6px;
+    }
+    .badge-room span{ font-size:1.2rem; }
+
+    .hearts{
+      text-align:right;
+      font-size:1rem;
+      color:#ef4444;
+      margin-bottom:4px;
+    }
+
+    .finish{
+      margin-top:14px;
+      padding:12px;
+      border-radius:14px;
+      background:linear-gradient(135deg,#22c55e,#0ea5e9);
+      color:white;
+      font-weight:600;
+      display:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Escape Room – Coridorul de fizică</h1>
+    <p class="subtitle">
+      Salvează laboratorul rezolvând corect cele 3 provocări de cinematică.  
+      Ai <strong>3 vieți</strong> – la fiecare greșeală pierzi o inimă ❤️.
+    </p>
+
+    <div class="progress-bar">
+      <div id="progress" class="progress-fill"></div>
+    </div>
+
+    <div class="card">
+      <div class="hearts" id="hearts">❤️❤️❤️</div>
+      <div class="badge-room"><span>🧪</span> Nivel: Coridorul cu bile metalice</div>
+
+      <!-- PAS 1 -->
+      <div id="step1" class="step active">
+        <div class="step-indicator">Pasul 1 din 3 – viteza medie</div>
+        <div class="step-title">O sferă parcurge 40 m în 8 s.</div>
+        <p>Calculează viteza medie <em>v_med</em> a sferei.</p>
+        <label for="vmed-input">v_med (m/s)</label>
+        <input id="vmed-input" type="number" step="0.01">
+        <div class="hint">Hint: v_med = distanță / timp</div>
+        <button type="button" onclick="checkStep1()">Verifică</button>
+        <div id="fb1" class="feedback"></div>
+      </div>
+
+      <!-- PAS 2 -->
+      <div id="step2" class="step">
+        <div class="step-indicator">Pasul 2 din 3 – recunoaște mișcarea</div>
+        <div class="step-title">
+          Pe graficul x(t), punctele se așază pe o linie dreaptă, care urcă uniform.
+        </div>
+        <p>Ce tip de mișcare are sfera?</p>
+        <label><input type="radio" name="tip" value="mruv"> Mișcare rectilinie uniform variată (MRUV)</label><br>
+        <label><input type="radio" name="tip" value="mru"> Mișcare rectilinie uniformă (MRU)</label><br>
+        <label><input type="radio" name="tip" value="altceva"> Alt tip de mișcare</label>
+        <div class="hint">Hint: x(t) este o dreaptă, distanțele cresc egal în intervale egale de timp.</div>
+        <button type="button" onclick="checkStep2()">Verifică</button>
+        <div id="fb2" class="feedback"></div>
+      </div>
+
+      <!-- PAS 3 -->
+      <div id="step3" class="step">
+        <div class="step-indicator">Pasul 3 din 3 – MRUV accelerat</div>
+        <div class="step-title">
+          Sfera pornește acum din repaus pe o pantă netedă: v₀ = 0, a = 2 m/s².
+        </div>
+        <p>Cât este distanța parcursă după 5 s?</p>
+        <div class="hint">Hint: x = ½ · a · t²</div>
+        <label for="x5-input">x (m)</label>
+        <input id="x5-input" type="number" step="0.1">
+        <button type="button" onclick="checkStep3()">Verifică</button>
+        <div id="fb3" class="feedback"></div>
+      </div>
+
+      <div id="finish" class="finish">
+        🎉 Ușa laboratorului este descuiată!  
+        Ai trecut cu succes prin toate provocările de cinematică.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let lives = 3;
+    let currentStep = 1;
+
+    function updateHearts() {
+      const heartsEl = document.getElementById("hearts");
+      heartsEl.textContent = "❤️".repeat(lives);
+    }
+
+    function updateProgress() {
+      const progressEl = document.getElementById("progress");
+      const percent = (currentStep - 1) / 3 * 100;
+      progressEl.style.width = percent + "%";
+    }
+
+    function goToStep(step) {
+      ["step1","step2","step3"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("active");
+      });
+      const target = document.getElementById("step" + step);
+      if (target) {
+        target.classList.add("active");
+        currentStep = step;
+        updateProgress();
+      }
+    }
+
+    function loseLife(feedbackEl, message) {
+      lives--;
+      if (lives < 0) lives = 0;
+      updateHearts();
+      feedbackEl.textContent = message;
+      feedbackEl.className = "feedback err";
+
+      if (lives === 0) {
+        feedbackEl.textContent += " Joc terminat – reîncarcă pagina pentru a încerca din nou.";
+      }
+    }
+
+    function checkStep1() {
+      if (lives === 0) return;
+      const val = parseFloat(document.getElementById("vmed-input").value);
+      const fb = document.getElementById("fb1");
+      const correct = 40 / 8; // 5 m/s
+
+      if (isNaN(val)) {
+        fb.textContent = "Introdu o valoare numerică.";
+        fb.className = "feedback err";
+        return;
+      }
+
+      if (Math.abs(val - correct) < 0.01) {
+        fb.textContent = "✔ Corect! v_med = 5 m/s. Ușa 1 se deschide.";
+        fb.className = "feedback ok";
+        setTimeout(() => goToStep(2), 900);
+      } else {
+        loseLife(fb, "✖ Nu încă. Gândește-te: v_med = distanță / timp.");
+      }
+    }
+
+    function checkStep2() {
+      if (lives === 0) return;
+      const options = document.getElementsByName("tip");
+      let value = null;
+      for (const o of options) if (o.checked) value = o.value;
+      const fb = document.getElementById("fb2");
+
+      if (!value) {
+        fb.textContent = "Alege o variantă.";
+        fb.className = "feedback err";
+        return;
+      }
+
+      if (value === "mru") {
+        fb.textContent = "✔ Corect! Linia dreaptă crescătoare în x(t) înseamnă MRU.";
+        fb.className = "feedback ok";
+        setTimeout(() => goToStep(3), 900);
+      } else {
+        loseLife(fb, "✖ Mai gândește-te: la MRUV graficul x(t) este o parabolă, nu o dreaptă.");
+      }
+    }
+
+    function checkStep3() {
+      if (lives === 0) return;
+      const val = parseFloat(document.getElementById("x5-input").value);
+      const fb = document.getElementById("fb3");
+      const a = 2, t = 5;
+      const correct = 0.5 * a * t * t; // 25 m
+
+      if (isNaN(val)) {
+        fb.textContent = "Introdu o valoare numerică.";
+        fb.className = "feedback err";
+        return;
+      }
+
+      if (Math.abs(val - correct) < 0.1) {
+        fb.textContent = "✔ Corect! x = 25 m. Ai blocat sfera înainte să lovească ușa laboratorului.";
+        fb.className = "feedback ok";
+        const finish = document.getElementById("finish");
+        finish.style.display = "block";
+        document.getElementById("progress").style.width = "100%";
+      } else {
+        loseLife(fb, "✖ Nu e chiar atât. Încearcă formula x = ½ · a · t².");
+      }
+    }
+
+    // init
+    updateHearts();
+    updateProgress();
+  </script>
+</body>
+</html>
