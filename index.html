@@ -1,28 +1,127 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8" />
-<title>Elemente de Cinematică – Activități interactive</title>
-<meta name="description" content="Simulări MRU & MRUV pentru elevi. Introdu v0, accelerația a și timpul t, apoi vezi poziția și viteza în timp. Include mini Escape Room de fizică.">
+<meta charset="UTF-8">
+<title>Elemente de Cinematică – Laborator Interactiv</title>
+<meta name="description" content="Simulare MRU & MRUV, grafic poziție/viteză, escape-room fizică și quizuri interactive.">
 <style>
-body {font-family: Arial, sans-serif; max-width:800px; margin:40px auto; line-height:1.6;}
-h1 {color:#0a57a1;}
-a {color:#0a57a1; font-weight:bold;}
+body{
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background:#f7f9fc;
+    margin:0; padding:0;
+    color:#222;
+}
+header{
+    text-align:center;
+    background:#005bbb;
+    color:white;
+    padding:35px 20px;
+}
+header h1{ font-size:34px; margin:0; font-weight:700; }
+header p{ font-size:18px; opacity:.9; margin-top:8px; }
+
+.container{
+    max-width:900px;
+    margin:40px auto;
+    padding:10px 25px;
+}
+
+h2{ margin-top:40px; color:#005bbb; }
+
+.card-area{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:22px;
+    margin-top:25px;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+    transition:.25s;
+}
+.card:hover{ transform:scale(1.02); }
+
+.card h3{ margin:0 0 10px; color:#005bbb; }
+.card p{ line-height:1.5; }
+
+.btn{
+    display:block;
+    margin-top:12px;
+    background:#ff9f1c;
+    color:#222;
+    text-align:center;
+    padding:10px 14px;
+    border-radius:8px;
+    font-weight:600;
+    text-decoration:none;
+}
+.btn:hover{background:#ffa933;}
+
+footer{
+    margin:50px 0 20px;
+    text-align:center;
+    font-size:14px;
+    opacity:.7;
+}
 </style>
 </head>
 <body>
 
-<h1>Elemente de cinematică – Activități interactive</h1>
+<header>
+    <h1>Elemente de Cinematică</h1>
+    <p>Simulare de mișcare rectilinie | MRU & MRUV | Grafice | Jocuri & Quizuri</p>
+</header>
+
+<div class="container">
+
+<h2>📌 Ce poți face aici?</h2>
 <p>
-Alege un scenariu, introdu valorile pentru viteza inițială *v₀*, accelerația *a* și timpul *t*. 
-Apasă pe „Simulează mișcarea" și vezi ce se întâmplă cu poziția și viteza. 
-Sugestie rapidă: pentru MRU pune *a* = 0. Pentru MRUV alege un *a* pozitiv (accelerare) sau negativ (frânare).
+Explorează cinematică prin activități interactive. Introdu valori pentru <i>v₀</i> (viteza inițială),
+<i>a</i> (accelerația) și <i>t</i> (timpul), urmărește graficul <i>x(t)</i> și <i>v(t)</i>,
+joacă mini-escape room de fizică și testează-te cu quizuri.
+<br><br>
+Sugestii rapide:
+<br>▪ Pentru MRU → <i>a = 0</i>
+<br>▪ Pentru MRUV accelerezi cu <i>a > 0</i> sau frânezi cu <i>a < 0</i>
 </p>
 
-<p>
-👉 Deschide aplicația interactivă completă aici:
-<br><a href="cinematica_interactiv.html">Lansează simularea</a>
-</p>
+<h2>🎮 Activități interactive</h2>
+
+<div class="card-area">
+
+    <div class="card">
+        <h3>🔵 Simulare MRU & MRUV</h3>
+        <p>Introdu <i>v₀</i>, <i>a</i>, <i>t</i>. Privește mișcarea, poziția și viteza +
+        grafice <i>x(t)</i> & <i>v(t)</i>.</p>
+        <a class="btn" href="cinematica_interactiv.html" target="_blank">Deschide simularea</a>
+    </div>
+
+    <div class="card">
+        <h3>🟢 Escape Room Fizică</h3>
+        <p>Poți evada doar rezolvând probleme rapide de cinematică.</p>
+        <a class="btn" href="cinematica_interactiv.html" target="_blank">Intră în Escape Room</a>
+    </div>
+
+    <div class="card">
+        <h3>🟡 Quiz 1 – MRU/MRUV</h3>
+        <p>Răspunde la întrebări. Primești feedback instant.</p>
+        <a class="btn" href="joc_cinematica_quiz.html" target="_blank">Start Quiz</a>
+    </div>
+
+    <div class="card">
+        <h3>🟣 Ghicește Mișcarea</h3>
+        <p>Privește graficul și spune: MRU sau MRUV?</p>
+        <a class="btn" href="joc_cinematica_ghiceste.html" target="_blank">Joacă mini-joc</a>
+    </div>
+
+</div>
+
+<footer>© 2025 • Laborator Cinematică Interactiv</footer>
+
+</div>
 
 </body>
 </html>
