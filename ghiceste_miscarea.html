@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ghiceste Mișcarea – MRU sau MRUV?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Mini-joc de cinematică: privește graficul x(t) și spune dacă este mișcare rectilinie uniformă (MRU) sau uniform variată (MRUV).">
+  <style>
+    :root {
+      --accent: #4f46e5;
+      --bg: #eef2ff;
+      --card-bg: #ffffff;
+      --muted: #6b7280;
+      --success: #16a34a;
+      --error: #dc2626;
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #d1d5ff 0, #eef2ff 40%, #f9fafb 100%);
+      color: #111827;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.9rem;
+      margin: 0 0 0.3rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 18px 18px 22px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .badge span { font-size: 1.1rem; }
+
+    .task {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    .graph-box {
+      margin-top: 10px;
+      border-radius: 16px;
+      background: #f3f4ff;
+      border: 1px solid #e0e7ff;
+      padding: 10px 12px 14px;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4f46e5;
+      margin-bottom: 6px;
+    }
+
+    .graph-container {
+      position: relative;
+      width: 100%;
+      height: 220px;
+    }
+
+    #graph {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .graph-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .choices {
+      margin-top: 14px;
+      font-size: 0.95rem;
+    }
+
+    .choices label {
+      display: block;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover { filter: brightness(1.06); }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+      margin-left: 8px;
+      box-shadow: none;
+    }
+    .btn-secondary:hover { filter: brightness(1.03); }
+
+    .feedback {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .feedback.ok { color: var(--success); }
+    .feedback.err { color: var(--error); }
+
+    .streak {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Ghiceste Mișcarea</h1>
+    <p class="subtitle">
+      Privește graficul poziției x(t) și decide: este mișcare rectilinie uniformă (MRU)
+      sau mișcare rectilinie uniform variată (MRUV)?
+    </p>
+
+    <div class="card">
+      <div class="badge"><span>📈</span> Mini-joc: recunoaște tipul de mișcare</div>
+      <p class="task">
+        Uită-te la forma graficului. Apoi alege varianta corectă și apasă „Verifică”.
+      </p>
+
+      <div class="graph-box">
+        <div class="graph-title">Graficul x(t)</div>
+        <div class="graph-container">
+          <canvas id="graph"></canvas>
+        </div>
+        <div class="graph-labels">
+          <span>x (m)</span>
+          <span>t (s)</span>
+        </div>
+      </div>
+
+      <div class="choices">
+        <label><input type="radio" name="tip" value="MRU"> MRU – mișcare rectilinie uniformă (viteza este constantă)</label>
+        <label><input type="radio" name="tip" value="MRUV"> MRUV – mișcare rectilinie uniform variată (viteza se schimbă în timp)</label>
+      </div>
+
+      <button type="button" onclick="checkAnswer()">Verifică</button>
+      <button type="button" class="btn-secondary" onclick="newGraph()">Grafic nou</button>
+
+      <div id="feedback" class="feedback"></div>
+      <div id="streak" class="streak"></div>
+    </div>
+  </div>
+
+  <script>
+    let correctType = "MRU"; // "MRU" sau "MRUV"
+    let streak = 0;
+
+    function randomRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function newGraph() {
+      const canvas = document.getElementById("graph");
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const left = 35;
+      const bottom = h - 25;
+      const right = w - 10;
+      const top = 15;
+
+      // Axe
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(left, bottom);
+      ctx.lineTo(right, bottom);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(left, bottom);
+      ctx.lineTo(left, top);
+      ctx.stroke();
+
+      // Alegem tipul: MRU sau MRUV
+      correctType = Math.random() < 0.5 ? "MRU" : "MRUV";
+
+      const tMax = 6;
+      const n = 40;
+      const points = [];
+      let xMax = 0;
+
+      const v0 = randomRange(0.5, 3);
+      const a = correctType === "MRU" ? 0 : randomRange(-1.5, 1.5) || 1; // să nu fie 0
+
+      for (let i = 0; i <= n; i++) {
+        const t = (tMax * i) / n;
+        const x = v0 * t + 0.5 * a * t * t;
+        points.push({ t, x });
+        if (x > xMax) xMax = x;
+      }
+      if (xMax === 0) xMax = 1;
+
+      const width = right - left;
+      const height = bottom - top;
+
+      // Culoare grafic
+      ctx.strokeStyle = correctType === "MRU" ? "#2563eb" : "#a855f7";
+      ctx.lineWidth = 2.4;
+
+      ctx.beginPath();
+      points.forEach((p, idx) => {
+        const px = left + (p.t / tMax) * width;
+        const py = bottom - (p.x / xMax) * height;
+        if (idx === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+
+      // Marcaje simple pe axa timpului
+      ctx.fillStyle = "#6b7280";
+      ctx.font = "10px system-ui";
+      ctx.textAlign = "center";
+      const ticks = 3;
+      for (let i = 0; i <= ticks; i++) {
+        const tt = (tMax * i) / ticks;
+        const px = left + (tt / tMax) * width;
+        ctx.beginPath();
+        ctx.moveTo(px, bottom);
+        ctx.lineTo(px, bottom + 4);
+        ctx.strokeStyle = "#cbd5f5";
+        ctx.stroke();
+        ctx.fillText(tt.toFixed(0), px, bottom + 14);
+      }
+
+      // Reset UI
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      const radios = document.getElementsByName("tip");
+      for (const r of radios) r.checked = false;
+    }
+
+    function checkAnswer() {
+      const radios = document.getElementsByName("tip");
+      let chosen = null;
+      for (const r of radios) if (r.checked) chosen = r.value;
+
+      const fb = document.getElementById("feedback");
+      const st = document.getElementById("streak");
+
+      if (!chosen) {
+        fb.textContent = "Alege mai întâi MRU sau MRUV.";
+        fb.className = "feedback err";
+        return;
+      }
+
+      if (chosen === correctType) {
+        streak++;
+        fb.textContent = "✔ Corect! Este " + correctType + ".";
+        fb.className = "feedback ok";
+      } else {
+        streak = 0;
+        fb.textContent = "✖ Nu e corect. Uită-te la forma graficului și încearcă din nou.";
+        fb.className = "feedback err";
+      }
+
+      if (streak >= 3) {
+        st.textContent = "🔥 Serie bună! Ai răspuns corect de " + streak + " ori la rând.";
+      } else if (streak > 0) {
+        st.textContent = "Până acum ai o serie de " + streak + " răspunsuri corecte la rând.";
+      } else {
+        st.textContent = "";
+      }
+    }
+
+    // Desenează primul grafic la încărcare
+    window.addEventListener("load", newGraph);
+    window.addEventListener("resize", newGraph);
+  </script>
+</body>
+</html>
